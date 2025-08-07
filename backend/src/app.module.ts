@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { Meme } from './entities/meme.entity';
 import { Submission } from './entities/submission.entity';
 import { MemeController } from './controller/meme.controller';
 import { SubmissionController } from './controller/submission.controller';
+import { UploadController } from './controller/upload.controller';
 import { MemeService } from './service/meme.service';
 import { SubmissionService } from './service/submission.service';
 
@@ -27,8 +30,14 @@ import { SubmissionService } from './service/submission.service';
     }),
 
     TypeOrmModule.forFeature([Meme, Submission]),
+    
+    // 静态文件服务，用于提供上传的图片
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
   ],
-  controllers: [MemeController, SubmissionController],
+  controllers: [MemeController, SubmissionController, UploadController],
   providers: [MemeService, SubmissionService],
 })
 export class AppModule {}

@@ -18,11 +18,11 @@ export class Meme {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'enum', enum: MemeLanguage })
+  @Column({ type: 'enum', enum: MemeLanguage, default: MemeLanguage.CHINESE })
   language: MemeLanguage;
 
   @Column()
-  keyword: string;
+  term: string;
 
   @Column({ type: 'text' })
   explanation: string;

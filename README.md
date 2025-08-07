@@ -99,10 +99,11 @@ wutmeme/
 - Wutmeme is created by [JadenHuang-dev] as a solo project to explore AI-based meme analysis and full-stack web development using modern tools.
 
 ```
-dev up
+run:
 
-cd wutmeme/frontend
-npm run dev
+docker-compose up frontend
+docker-compose up backend
+docker-compose up --build
 
 
 ```
