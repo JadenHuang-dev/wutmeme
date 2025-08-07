@@ -35,7 +35,7 @@ The goal is to build a fully functional prototype within one month.
 | **NestJS** | Scalable server-side framework |
 | **TypeORM** | ORM for DB access |
 | **PostgreSQL** | Primary database |
-| **AdminJS** | Lightweight admin dashboard |
+| **AdminJS** | Lightweight admin dashboard | (removed maybe replaced by django or other framework in the future)
 | **Multer / Formidable** | File uploads (image support) |
 | **OpenAI API** | Meme detection via LLMs |
 | **Redis / Caching** (optional) | Avoid redundant LLM calls |
@@ -104,5 +104,16 @@ dev up
 cd wutmeme/frontend
 npm run dev
 
+
+```
+
+## if installing dependency so slow try
+```
+npm config set registry https://registry.npmmirror.com
+
+```
+After that
+```
+npm config set registry https://registry.npmjs.org
 
 ```
