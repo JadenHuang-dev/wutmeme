@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { MemeTerm } from '../components/MemeTerms';
 
 // API基础URL配置
-const API_BASE_URL = 'http://localhost:3000'; // 后端服务地址
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // 直接连接后端服务地址
 
 // 创建axios实例
 const apiClient = axios.create({

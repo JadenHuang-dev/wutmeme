@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
@@ -13,6 +11,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wutmeme_user -d wutmeme"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -22,12 +25,17 @@ services:
     env_file:
       - ./backend/.env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
-      - "3000:3000"
+      - "3000:3000"  # 直接暴露后端端口
     working_dir: /app
     volumes:
       - ./backend:/app
+      - ./backend/uploads:/app/uploads
+    environment:
+      - DB_HOST=postgres  # 确保使用Docker服务名而不是localhost
+      - API_BASE_URL=http://localhost:3000
     command: npm run start:dev
 
   frontend:
@@ -36,12 +44,17 @@ services:
     container_name: wutmeme-frontend
     restart: unless-stopped
     ports:
-      - "5173:80"
+      - "5173:80"  # 直接暴露前端端口
     volumes:
       - ./frontend:/app
       - /app/node_modules
     depends_on:
       - backend
+    environment:
+      - VITE_API_URL=http://localhost:3000  # 前端直接连接后端API
+
+  # 使用backend直接暴露API，而不通过nginx代理
+  # 如果后续网络问题解决，可以再恢复nginx配置
       
 volumes:
   pgdata:

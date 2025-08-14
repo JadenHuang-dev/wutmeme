@@ -11,7 +11,6 @@ import { UploadController } from './controller/upload.controller';
 import { MemeService } from './service/meme.service';
 import { SubmissionService } from './service/submission.service';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,7 +29,7 @@ import { SubmissionService } from './service/submission.service';
     }),
 
     TypeOrmModule.forFeature([Meme, Submission]),
-    
+
     // 静态文件服务，用于提供上传的图片
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),

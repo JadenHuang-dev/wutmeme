@@ -99,13 +99,37 @@ wutmeme/
 - Wutmeme is created by [JadenHuang-dev] as a solo project to explore AI-based meme analysis and full-stack web development using modern tools.
 
 ```
-run:
+# 启动方式
 
-docker-compose up frontend
-docker-compose up backend
+## 一键启动所有服务
+```bash
+# 构建并启动所有服务
 docker-compose up --build
 
+# 或者在后台运行
+docker-compose up -d --build
+```
 
+## 分开启动服务
+```bash
+# 仅启动后端服务
+docker-compose up backend
+
+# 仅启动前端服务
+docker-compose up frontend
+
+# 仅启动数据库
+docker-compose up postgres
+```
+
+## 停止服务
+```bash
+# 停止所有服务
+docker-compose down
+
+# 停止并删除所有卷（包括数据库数据）
+docker-compose down -v
+```
 ```
 
 ## if installing dependency so slow try

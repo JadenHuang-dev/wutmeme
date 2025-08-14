@@ -9,7 +9,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
-import * as multer from 'multer';
+import {
+  ApiTags,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+} from '@nestjs/swagger';
+import { FileUploadDto, FileUploadResponseDto } from '../dto/file-upload.dto';
 
 // 确保上传目录存在
 const uploadDir = './uploads';
@@ -17,9 +24,22 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+@ApiTags('uploads')
 @Controller('uploads')
 export class UploadController {
   @Post()
+  @ApiOperation({ summary: '上传图片文件' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: '要上传的图片文件',
+    type: FileUploadDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: '文件上传成功',
+    type: FileUploadResponseDto,
+  })
+  @ApiResponse({ status: 400, description: '无效的文件或不支持的文件类型' })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -45,7 +65,7 @@ export class UploadController {
       },
     }),
   )
-  uploadFile(@UploadedFile() file: any) {
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('文件无效');
     }
