@@ -37,7 +37,7 @@ The goal is to build a fully functional prototype within one month.
 | **PostgreSQL** | Primary database |
 | **AdminJS** | Lightweight admin dashboard | (removed maybe replaced by django or other framework in the future)
 | **Multer / Formidable** | File uploads (image support) |
-| **OpenAI API** | Meme detection via LLMs |
+| **Genai** | Meme detection via LLMs |
 | **Redis / Caching** (optional) | Avoid redundant LLM calls |
 
 ### 🧪 Dev Tools
