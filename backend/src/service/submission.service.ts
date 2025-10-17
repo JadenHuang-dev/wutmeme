@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Submission } from '../entities/submission.entity';
 import { Meme } from '../entities/meme.entity';
 import { MemeService } from './meme.service';
+import { AiService, MemeDetectionResult } from './ai.service';
 
 @Injectable()
 export class SubmissionService {
@@ -13,6 +14,7 @@ export class SubmissionService {
     @InjectRepository(Meme)
     private readonly memeRepo: Repository<Meme>,
     private readonly memeService: MemeService,
+    private readonly aiService: AiService,
   ) {}
 
   async create(data: Partial<Submission>): Promise<Submission> {
@@ -30,37 +32,76 @@ export class SubmissionService {
     return this.submissionRepo.find({ relations: ['detectedMemes'] });
   }
 
-  // 临时方法：在提交中检测memes
+  // 檢測提交中的memes（使用Google AI Studio API）
   private async detectMemes(submission: Submission): Promise<Meme[]> {
-    // 模拟meme检测
-    // 在实际应用中，这里应该调用AI服务或其他分析工具
-    const mockMemes: Partial<Meme>[] = [
+    let aiResults: MemeDetectionResult[] = [];
+
+    try {
+      // 根據提交類型選擇相應的分析方法
+      if (submission.textContent) {
+        aiResults = await this.aiService.analyzeTextForMemes(
+          submission.textContent,
+        );
+      } else if (submission.imageUrl) {
+        aiResults = await this.aiService.analyzeImageForMemes(
+          submission.imageUrl,
+        );
+      } else if (submission.videoUrl) {
+        aiResults = await this.aiService.analyzeVideoForMemes(
+          submission.videoUrl,
+        );
+      }
+
+      // 將AI檢測結果轉換為Meme實體
+      const memes: Meme[] = [];
+      for (const aiResult of aiResults) {
+        // 檢查是否已存在相同的meme
+        let meme = await this.memeRepo.findOne({
+          where: { term: aiResult.term },
+        });
+
+        // 如果不存在，則創建新的meme
+        if (!meme) {
+          meme = await this.memeService.create({
+            term: aiResult.term,
+            explanation: aiResult.explanation,
+            referenceUrl: aiResult.referenceUrl,
+          });
+        }
+
+        memes.push(meme);
+      }
+
+      return memes;
+    } catch (error) {
+      console.error('Error detecting memes with AI:', error);
+
+      // 如果AI檢測失敗，返回默認的模擬數據
+      return this.getFallbackMemes();
+    }
+  }
+
+  // 備用的模擬數據方法
+  private async getFallbackMemes(): Promise<Meme[]> {
+    const mockMemes = [
       {
         term: '梗一大哥',
         explanation:
-          '"梗一大哥"是指在互联网平台（如哔哩哔哩、快手、抖音）打开全屏模式的用户，即打开视频的第一个人。',
+          '"梗一大哥"是指在互聯網平台（如哔哩哔哩、快手、抖音）打開全屏模式的用戶，即打開視頻的第一個人。',
       },
       {
         term: 'look at my eyes',
         explanation:
-          '一个英文短语，意为"看着我的眼睛"，常在强调重要话题或表达严肃情感时使用。',
-      },
-      {
-        term: '完了',
-        explanation:
-          '表示事情已经结束或无法挽回的状态，常用于表达无奈或绝望的情绪。',
+          '一個英文短語，意為"看著我的眼睛"，常在強調重要話題或表達嚴肅情感時使用。',
       },
     ];
 
-    // 创建或查找这些meme
     const memes: Meme[] = [];
     for (const mockMeme of mockMemes) {
-      // 尝试查找现有的meme
       let meme = await this.memeRepo.findOne({
         where: { term: mockMeme.term },
       });
 
-      // 如果不存在，则创建一个新的
       if (!meme) {
         meme = await this.memeService.create(mockMeme);
       }

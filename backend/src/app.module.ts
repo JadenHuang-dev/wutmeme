@@ -10,6 +10,7 @@ import { SubmissionController } from './controller/submission.controller';
 import { UploadController } from './controller/upload.controller';
 import { MemeService } from './service/meme.service';
 import { SubmissionService } from './service/submission.service';
+import { AiService } from './service/ai.service';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { SubmissionService } from './service/submission.service';
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      database: process.env.DB_DATABASE,
       entities: [Meme, Submission],
       synchronize: true, // dev: true，production: false
     }),
@@ -37,6 +38,6 @@ import { SubmissionService } from './service/submission.service';
     }),
   ],
   controllers: [MemeController, SubmissionController, UploadController],
-  providers: [MemeService, SubmissionService],
+  providers: [MemeService, SubmissionService, AiService],
 })
 export class AppModule {}
